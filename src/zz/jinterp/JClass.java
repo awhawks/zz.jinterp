@@ -153,16 +153,18 @@ public abstract class JClass extends JType
 	
 	public JField getVirtualField(String aName)
 	{
+		boolean theIgnorePrivate = false;
 		JClass theClass = this;
 		while(theClass != null) 
 		{
 			JField theField = theClass.getField(aName);
 			if (theField != null) 
 			{
-				if (theField.isPrivate()) return null;
+				if (theField.isPrivate() && theIgnorePrivate) return null;
 				else return theField;
 			}
 			theClass = theClass.getSuperclass();
+			theIgnorePrivate = true;
 		}
 		return null;
 	}
