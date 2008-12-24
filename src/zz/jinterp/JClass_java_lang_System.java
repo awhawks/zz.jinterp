@@ -55,7 +55,8 @@ public class JClass_java_lang_System extends JNormalClass
 		JArray dest = (JArray) aArgs[2];
 		JInt destPos = (JInt) aArgs[3];
 		JInt len = (JInt) aArgs[4];
-		System.arraycopy(src.v, srcPos.v, dest.v, destPos.v, len.v);
+		
+		for(int i=0;i<len.v;i++) dest.set(i+destPos.v, src.get(i+srcPos.v));
 		
 		return JPrimitive.VOID;
 	}

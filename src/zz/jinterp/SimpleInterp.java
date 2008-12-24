@@ -55,6 +55,12 @@ public class SimpleInterp extends JInterpreter
 		}
 	}
 
+	@Override
+	public JField createField(JClass aClass, String aName, JType aType, boolean aPrivate)
+	{
+		return new SimpleField(aClass, aName, aType, aPrivate);
+	}
+
 	public static class SimpleInstance extends JInstance
 	{
 		private final Map<JField, JObject> itsFields = new HashMap<JField, JObject>();
@@ -75,6 +81,56 @@ public class SimpleInterp extends JInterpreter
 		{
 			itsFields.put(aField, aValue);
 		}
+	}
+	
+	public static class SimpleArray extends JArray
+	{
+		private final JObject[] itsValues;
 		
+		public SimpleArray(int aSize)
+		{
+			itsValues = new JObject[aSize];
+		}
+
+		@Override
+		public int getSize()
+		{
+			return itsValues.length;
+		}
+
+		@Override
+		public JObject get(int aIndex)
+		{
+			return itsValues[aIndex];
+		}
+
+		@Override
+		public void set(int aIndex, JObject aValue)
+		{
+			itsValues[aIndex] = aValue;
+		}
+	}
+	
+	public static class SimpleField extends JField
+	{
+		private JObject itsStaticValue;
+
+		public SimpleField(JClass aClass, String aName, JType aType, boolean aPrivate)
+		{
+			super(aClass, aName, aType, aPrivate);
+			itsStaticValue = getType().getInitialValue();
+		}
+
+		@Override
+		public JObject getStaticFieldValue()
+		{
+			return itsStaticValue;
+		}
+
+		@Override
+		public void putStaticFieldValue(JObject aValue)
+		{
+			itsStaticValue = aValue;
+		}
 	}
 }

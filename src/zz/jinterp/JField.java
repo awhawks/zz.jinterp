@@ -35,7 +35,7 @@ package zz.jinterp;
  * Represents a field in a class of the interpreter
  * @author gpothier
  */
-public class JField extends JMember
+public abstract class JField extends JMember
 {
 	private final String itsName;
 	private final JType itsType;
@@ -63,4 +63,7 @@ public class JField extends JMember
 	{
 		return itsPrivate;
 	}
+	
+	public abstract JObject getStaticFieldValue();
+	public abstract void putStaticFieldValue(JObject aValue);
 }

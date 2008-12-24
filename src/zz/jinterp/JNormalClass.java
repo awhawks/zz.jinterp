@@ -47,6 +47,11 @@ public class JNormalClass extends JClass
 	{
 		super(aInterpreter, getSuperclass(aInterpreter, aNode));
 		itsNode = aNode;
+	}
+	
+	@Override
+	void init()
+	{
 		initBehaviors();
 	}
 	
@@ -69,7 +74,7 @@ public class JNormalClass extends JClass
 				FieldNode theFieldNode = (FieldNode) theIterator.next();
 				JType theType = getInterpreter().getType(theFieldNode.desc);
 				
-				JField theField = new JField(
+				JField theField = getInterpreter().createField(
 						this, 
 						theFieldNode.name, 
 						theType,

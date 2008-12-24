@@ -31,14 +31,11 @@ Inc. MD5 Message-Digest Algorithm".
 */
 package zz.jinterp;
 
-public class JArray extends JObject
+public abstract class JArray extends JObject
 {
-	public final JObject[] v;
-
-	public JArray(int aSize)
-	{
-		v = new JObject[aSize];
-	}
+	public abstract int getSize();
+	public abstract JObject get(int aIndex);
+	public abstract void set(int aIndex, JObject aValue);
 
 	@Override
 	public JType getType()
@@ -50,8 +47,9 @@ public class JArray extends JObject
 	public String toString()
 	{
 		StringBuilder theBuilder = new StringBuilder("[");
-		for (JObject theObject : v)
+		for (int i=0;i<getSize();i++)
 		{
+			JObject theObject = get(i);
 			theBuilder.append(theObject);
 			theBuilder.append(", ");
 		}

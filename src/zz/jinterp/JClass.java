@@ -48,11 +48,21 @@ public abstract class JClass extends JType
 	
 	private final Map<String, JBehavior> itsBehaviors = new HashMap<String, JBehavior>();
 	private final Map<String, JField> itsFields = new HashMap<String, JField>();
-
+	
 	protected JClass(JInterpreter aInterpreter, JClass aSuperClass)
 	{
 		itsInterpreter = aInterpreter;
 		itsSuperclass = aSuperClass;
+	}
+
+	/**
+	 * Perform the initialization of this class.
+	 * In particular any action that might cause a class to be retrieved 
+	 * from the interpreter should be executed in this method instead of 
+	 * in the constructor to avoid infinite recursion.
+	 */
+	void init()
+	{
 	}
 	
 	public abstract String getName();

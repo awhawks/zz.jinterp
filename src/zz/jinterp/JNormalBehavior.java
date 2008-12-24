@@ -50,7 +50,7 @@ import zz.jinterp.JPrimitive.JInt;
 import zz.jinterp.JPrimitive.JLong;
 import zz.jinterp.JPrimitive.JNumber;
 import zz.jinterp.JPrimitive.JShort;
-import zz.jinterp.JPrimitive.JVoid;
+import zz.jinterp.SimpleInterp.SimpleArray;
 
 public class JNormalBehavior extends JASMBehavior
 {
@@ -263,10 +263,13 @@ public class JNormalBehavior extends JASMBehavior
 			switch(aOpcode)
 			{
 			case GETSTATIC:
-				throw new UnsupportedOperationException();
+				push(theField.getStaticFieldValue());
+				break;
 				
-			case PUTSTATIC:
-				throw new UnsupportedOperationException();
+			case PUTSTATIC: {
+				JObject v = pop();
+				theField.putStaticFieldValue(v);
+			} break;
 				
 			case GETFIELD: {
 				JInstance target = (JInstance) pop();
@@ -373,7 +376,7 @@ public class JNormalBehavior extends JASMBehavior
 			case SALOAD: {
 				JInt index = (JInt) pop();
 				JArray array = (JArray) pop();
-				push(array.v[index.v]);
+				push(array.get(index.v));
 			} break;
 				
 			case IASTORE:
@@ -387,7 +390,7 @@ public class JNormalBehavior extends JASMBehavior
 				JInt index = (JInt) pop();
 				JArray array = (JArray) pop();
 				JObject value = pop();
-				array.v[index.v] = value;
+				array.set(index.v, value);
 			} break;
 				
 			case POP:
@@ -660,7 +663,7 @@ public class JNormalBehavior extends JASMBehavior
 				
 			case ARRAYLENGTH: {
 				JArray array = (JArray) pop();
-				push(new JInt(array.v.length));
+				push(new JInt(array.getSize()));
 			} break;
 				
 			case ATHROW:
@@ -691,7 +694,7 @@ public class JNormalBehavior extends JASMBehavior
 				
 			case NEWARRAY: {
 				JInt size = (JInt) pop();
-				push(new JArray(size.v));
+				push(new SimpleArray(size.v));
 			} break;
 				
 			default: 

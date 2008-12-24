@@ -43,6 +43,7 @@ import zz.jinterp.JNormalBehavior.JFrame;
 import zz.jinterp.JPrimitive.JChar;
 import zz.jinterp.JPrimitive.JInt;
 import zz.jinterp.JPrimitive.JLong;
+import zz.jinterp.SimpleInterp.SimpleArray;
 import zz.jinterp.SimpleInterp.SimpleInstance;
 
 /**
@@ -71,7 +72,7 @@ public abstract class JInterpreter
 	 */
 	protected abstract byte[] getClassBytecode(String aName);
 	
-	protected JClass getClass(String aName)
+	public JClass getClass(String aName)
 	{
 		JClass theClass = itsLoadedClasses.get(aName);
 		if (theClass == null)
@@ -79,6 +80,7 @@ public abstract class JInterpreter
 			byte[] theBytecode = getClassBytecode(aName);
 			theClass = new JNormalClass(this, JNormalClass.readClass(theBytecode));
 			itsLoadedClasses.put(aName, theClass);
+			theClass.init();
 		}
 		return theClass;
 	}
@@ -93,6 +95,7 @@ public abstract class JInterpreter
 			Constructor theConstructor = theClass.getConstructor(JInterpreter.class, ClassNode.class);
 			JClass theInstance = (JClass) theConstructor.newInstance(this, theClassNode);
 			itsLoadedClasses.put(aName, theInstance);
+			theInstance.init();
 		}
 		catch (Exception e)
 		{
@@ -118,6 +121,12 @@ public abstract class JInterpreter
 		return theClass.getVirtualBehavior(aMethodName, aSignature);
 	}
 	
+	/**
+	 * Creates a field descriptor.
+	 * This method can be overridden by subclasses, in particular if they need
+	 * some special handling of static field values.
+	 */
+	public abstract JField createField(JClass aClass, String aName, JType aType, boolean aPrivate);
 
 	/**
 	 * Executes a method
@@ -228,8 +237,8 @@ public abstract class JInterpreter
 		theInstance.putFieldValue(fCount, new JInt(aString.length()));
 		theInstance.putFieldValue(fHash, new JInt(aString.hashCode()));
 		
-		JArray theValue = new JArray(aString.length());
-		for(int i=0;i<aString.length();i++) theValue.v[i] = new JChar(aString.charAt(i));
+		JArray theValue = new SimpleArray(aString.length());
+		for(int i=0;i<aString.length();i++) theValue.set(i, new JChar(aString.charAt(i)));
 		theInstance.putFieldValue(fValue, theValue);
 		
 		return theInstance;
@@ -249,7 +258,7 @@ public abstract class JInterpreter
 		JArray theValue = (JArray) aInstance.getFieldValue(fValue);
 		
 		char[] theChars = new char[theCount.v];
-		for(int i=0;i<theCount.v;i++) theChars[i] = ((JChar) theValue.v[i+theOffset.v]).v;
+		for(int i=0;i<theCount.v;i++) theChars[i] = ((JChar) theValue.get(i+theOffset.v)).v;
 		
 		return new String(theChars);
 	}

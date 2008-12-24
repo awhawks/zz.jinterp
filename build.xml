@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="zz.jinterp" default="jar" basedir="." >
+	
+	<property environment="env"/>
+	
+		
+	<target name="init">
+		<property name="path.src.java" location="${basedir}/src"/>
+		
+		<property name="path.build" location="${basedir}/build"/>
+		<property name="path.classes" location="${basedir}/classes"/>
+		
+		<property name="file.jar" location="${path.build}/zz.jinterp.jar"/>
+		
+		<property name="encoding" value="UTF-8"/>
+
+		<echo message="Base dir: ${basedir}" />
+	</target>	
+		
+	<target name="clean" depends="init">
+		<echo message="Cleaning everything."/>
+		<delete failonerror="false">
+			<fileset dir="${path.classes}"/>
+			<fileset dir="${path.build}"/>
+		</delete>
+	</target>
+	
+	<target name="compile" depends="init">
+		<mkdir dir="${path.classes}"/>
+		<javac compiler="javac1.5" source="1.5" target="1.5" 
+			srcdir="${path.src.java}"
+			nowarn="true"
+			destdir="${path.classes}"
+			encoding="${encoding}"
+			debug="true"
+	      	deprecation="on">
+			
+		</javac>
+	</target>
+	
+	<target name="jar" depends="init, compile">
+		
+		<mkdir dir="${path.build}"/>
+		<echo message="zz.jinterp: creating jar ${file.jar}"/>
+		<jar jarfile="${file.jar}" index="true">
+			<fileset dir="${path.classes}" />
+		</jar>
+		
+	</target>
+	
+</project>
