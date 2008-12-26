@@ -41,7 +41,7 @@ public class JClass_java_lang_Object extends JReflectiveClass
 	
 	public JClass_java_lang_Object(JInterpreter aInterpreter)
 	{
-		super(aInterpreter, null);
+		super(aInterpreter, null, new JClass[0]);
 		
 		putBehavior(getBehaviorKey("<init>", "()V"), new JBehavior(this)
 		{
@@ -64,7 +64,7 @@ public class JClass_java_lang_Object extends JReflectiveClass
 			}
 
 			@Override
-			public JObject invoke(JFrame aParentFrame, JObject aTarget, JObject... aArgs)
+			public JObject invoke0(JFrame aParentFrame, JObject aTarget, JObject... aArgs)
 			{
 				return JPrimitive.VOID;
 			}
@@ -77,6 +77,13 @@ public class JClass_java_lang_Object extends JReflectiveClass
 		return NAME;
 	}
 	
+	private static void __registerNatives() {}
+	public JObject _registerNatives(JFrame aParentFrame, JInstance aTarget, JObject[] aArgs)
+	{
+		return JPrimitive.VOID;
+	}
+	
+
 	public Class __getClass() {return null;}
 	public JObject _getClass(JFrame aParentFrame, JInstance aTarget, JObject[] aArgs)
 	{

@@ -33,6 +33,8 @@ package zz.jinterp;
 
 public class SimpleClass
 {
+	static int s = 5;
+	
 	public static int ari(int i1, int i2)
 	{
 		i2 += foo(i1);
@@ -47,5 +49,10 @@ public class SimpleClass
 	public static String strOp(String s1)
 	{
 		return s1+"hop";
+	}
+	
+	public static int s()
+	{
+		return s+1;
 	}
 }

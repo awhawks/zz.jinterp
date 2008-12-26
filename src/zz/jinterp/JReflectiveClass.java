@@ -38,10 +38,16 @@ import zz.jinterp.JNormalBehavior.JFrame;
 
 public abstract class JReflectiveClass extends JClass
 {
-	public JReflectiveClass(JInterpreter aInterpreter, JClass aSuperClass)
+	public JReflectiveClass(JInterpreter aInterpreter, JClass aSuperClass, JClass[] aInterfaces)
 	{
-		super(aInterpreter, aSuperClass);
+		super(aInterpreter, aSuperClass, aInterfaces);
 		initBehaviors(this, getClass());
+	}
+	
+	@Override
+	public boolean isInterface()
+	{
+		return false;
 	}
 	
 	public static void initBehaviors(JClass aTarget, Class aClass)
@@ -125,7 +131,7 @@ public abstract class JReflectiveClass extends JClass
 		}
 
 		@Override
-		public JObject invoke(JFrame aParentFrame, JObject aTarget, JObject... aArgs)
+		public JObject invoke0(JFrame aParentFrame, JObject aTarget, JObject... aArgs)
 		{
 			Object[] theArgs = {aParentFrame, aTarget, aArgs};
 			try

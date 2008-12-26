@@ -33,12 +33,20 @@ package zz.jinterp;
 
 public abstract class JPrimitive extends JObject
 {
+	public abstract int intValue();
+
 	public static class JVoid extends JPrimitive
 	{
 		@Override
 		public JType getType()
 		{
 			return JPrimitiveType.VOID;
+		}
+
+		@Override
+		public int intValue()
+		{
+			throw new UnsupportedOperationException();
 		}
 	}
 	
@@ -172,6 +180,12 @@ public abstract class JPrimitive extends JObject
 		{
 			return Integer.toString(v);
 		}
+		
+		@Override
+		public int intValue()
+		{
+			return v;
+		}
 	}
 	
 	public static class JLong extends JBitNumber
@@ -275,6 +289,12 @@ public abstract class JPrimitive extends JObject
 		{
 			return Long.toString(v);
 		}
+		
+		@Override
+		public int intValue()
+		{
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	public static class JFloat extends JNumber
@@ -337,6 +357,12 @@ public abstract class JPrimitive extends JObject
 		{
 			return Float.toString(v);
 		}
+
+		@Override
+		public int intValue()
+		{
+			throw new UnsupportedOperationException();
+		}
 	}
 	
 	public static class JDouble extends JNumber
@@ -398,6 +424,12 @@ public abstract class JPrimitive extends JObject
 		{
 			return Double.toString(v);
 		}
+
+		@Override
+		public int intValue()
+		{
+			throw new UnsupportedOperationException();
+		}
 	}
 	
 	public static class JByte extends JPrimitive
@@ -420,6 +452,12 @@ public abstract class JPrimitive extends JObject
 		public String toString()
 		{
 			return Byte.toString(v);
+		}
+
+		@Override
+		public int intValue()
+		{
+			return v;
 		}
 	}
 	
@@ -444,6 +482,12 @@ public abstract class JPrimitive extends JObject
 		{
 			return Character.toString(v);
 		}
+
+		@Override
+		public int intValue()
+		{
+			return v;
+		}
 	}
 	
 	public static class JShort extends JPrimitive
@@ -466,6 +510,12 @@ public abstract class JPrimitive extends JObject
 		public String toString()
 		{
 			return Short.toString(v);
+		}
+
+		@Override
+		public int intValue()
+		{
+			return v;
 		}
 	}
 }

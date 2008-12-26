@@ -31,22 +31,28 @@ Inc. MD5 Message-Digest Algorithm".
 */
 package zz.jinterp;
 
+import org.objectweb.asm.Opcodes;
+
 /**
  * Represents a field in a class of the interpreter
  * @author gpothier
  */
-public abstract class JField extends JMember
+public class JField extends JMember
 {
 	private final String itsName;
 	private final JType itsType;
-	private final boolean itsPrivate;
 	
-	public JField(JClass aClass, String aName, JType aType, boolean aPrivate)
+	/**
+	 * ASM access modifiers
+	 */
+	private final int  itsAccess;
+	
+	public JField(JClass aClass, String aName, JType aType, int aAccess)
 	{
 		super(aClass);
 		itsName = aName;
 		itsType = aType;
-		itsPrivate = aPrivate;
+		itsAccess = aAccess;
 	}
 	
 	public String getName()
@@ -61,9 +67,11 @@ public abstract class JField extends JMember
 	
 	public boolean isPrivate()
 	{
-		return itsPrivate;
+		return (itsAccess & Opcodes.ACC_PRIVATE) != 0;
 	}
 	
-	public abstract JObject getStaticFieldValue();
-	public abstract void putStaticFieldValue(JObject aValue);
+	public boolean isStatic()
+	{
+		return (itsAccess & Opcodes.ACC_STATIC) != 0;
+	}
 }

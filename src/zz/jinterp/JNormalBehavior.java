@@ -64,7 +64,7 @@ public class JNormalBehavior extends JASMBehavior
 	}
 	
 	@Override
-	public JObject invoke(JFrame aParentFrame, JObject aTarget, JObject... aArgs)
+	public JObject invoke0(JFrame aParentFrame, JObject aTarget, JObject... aArgs)
 	{
 		JObject[] theArgs;
 		if ((getNode().access & Opcodes.ACC_STATIC) == 0) 
@@ -263,12 +263,12 @@ public class JNormalBehavior extends JASMBehavior
 			switch(aOpcode)
 			{
 			case GETSTATIC:
-				push(theField.getStaticFieldValue());
+				push(((JStaticField) theField).getStaticFieldValue());
 				break;
 				
 			case PUTSTATIC: {
 				JObject v = pop();
-				theField.putStaticFieldValue(v);
+				((JStaticField) theField).putStaticFieldValue(v);
 			} break;
 				
 			case GETFIELD: {
@@ -296,6 +296,7 @@ public class JNormalBehavior extends JASMBehavior
 		{
 			JInt i = (JInt) local(aVar);
 			local(aVar, new JInt(i.v+aIncrement));
+			itsInstructionPointer++;
 		}
 
 		@Override
@@ -383,14 +384,32 @@ public class JNormalBehavior extends JASMBehavior
 			case LASTORE:
 			case FASTORE:
 			case DASTORE:
-			case AASTORE:
-			case BASTORE:
-			case CASTORE:
-			case SASTORE: {
+			case AASTORE: {
+				JObject value = pop();
 				JInt index = (JInt) pop();
 				JArray array = (JArray) pop();
-				JObject value = pop();
 				array.set(index.v, value);
+			} break;
+				
+			case BASTORE: {
+				JPrimitive value = (JPrimitive) pop();
+				JInt index = (JInt) pop();
+				JArray array = (JArray) pop();
+				array.set(index.v, new JByte((byte) value.intValue()));
+			} break;
+			
+			case CASTORE: {
+				JPrimitive value = (JPrimitive) pop();
+				JInt index = (JInt) pop();
+				JArray array = (JArray) pop();
+				array.set(index.v, new JChar((char) value.intValue()));
+			} break;
+			
+			case SASTORE: {
+				JPrimitive value = (JPrimitive) pop();
+				JInt index = (JInt) pop();
+				JArray array = (JArray) pop();
+				array.set(index.v, new JShort((short) value.intValue()));
 			} break;
 				
 			case POP:
@@ -715,102 +734,102 @@ public class JNormalBehavior extends JASMBehavior
 			switch(aOpcode)
 			{
 			case IFEQ: {
-				JInt x = (JInt) pop();
-				if (x.v == 0) {
+				JPrimitive x = (JPrimitive) pop();
+				if (x.intValue() == 0) {
 					jump(aLabel);
 					return;
 				}
 			} break;
 				
 			case IFNE: {
-				JInt x = (JInt) pop();
-				if (x.v != 0) {
+				JPrimitive x = (JPrimitive) pop();
+				if (x.intValue() != 0) {
 					jump(aLabel);
 					return;
 				}
 			} break;
 				
 			case IFLT: {
-				JInt x = (JInt) pop();
-				if (x.v < 0) {
+				JPrimitive x = (JPrimitive) pop();
+				if (x.intValue() < 0) {
 					jump(aLabel);
 					return;
 				}
 			} break;
 				
 			case IFGE: {
-				JInt x = (JInt) pop();
-				if (x.v >= 0) {
+				JPrimitive x = (JPrimitive) pop();
+				if (x.intValue() >= 0) {
 					jump(aLabel);
 					return;
 				}
 			} break;
 				
 			case IFGT: {
-				JInt x = (JInt) pop();
-				if (x.v > 0) {
+				JPrimitive x = (JPrimitive) pop();
+				if (x.intValue() > 0) {
 					jump(aLabel);
 					return;
 				}
 			} break;
 				
 			case IFLE: {
-				JInt x = (JInt) pop();
-				if (x.v <= 0) {
+				JPrimitive x = (JPrimitive) pop();
+				if (x.intValue() <= 0) {
 					jump(aLabel);
 					return;
 				}
 			} break;
 				
 			case IF_ICMPEQ: {
-				JInt x2 = (JInt) pop();
-				JInt x1 = (JInt) pop();
-				if (x1.v == x2.v) {
+				JPrimitive x2 = (JPrimitive) pop();
+				JPrimitive x1 = (JPrimitive) pop();
+				if (x1.intValue() == x2.intValue()) {
 					jump(aLabel);
 					return;
 				}
 			} break;
 				
 			case IF_ICMPNE: {
-				JInt x2 = (JInt) pop();
-				JInt x1 = (JInt) pop();
-				if (x1.v != x2.v) {
+				JPrimitive x2 = (JPrimitive) pop();
+				JPrimitive x1 = (JPrimitive) pop();
+				if (x1.intValue() != x2.intValue()) {
 					jump(aLabel);
 					return;
 				}
 			} break;
 				
 			case IF_ICMPLT: {
-				JInt x2 = (JInt) pop();
-				JInt x1 = (JInt) pop();
-				if (x1.v < x2.v) {
+				JPrimitive x2 = (JPrimitive) pop();
+				JPrimitive x1 = (JPrimitive) pop();
+				if (x1.intValue() < x2.intValue()) {
 					jump(aLabel);
 					return;
 				}
 			} break;
 				
 			case IF_ICMPGE: {
-				JInt x2 = (JInt) pop();
-				JInt x1 = (JInt) pop();
-				if (x1.v >= x2.v) {
+				JPrimitive x2 = (JPrimitive) pop();
+				JPrimitive x1 = (JPrimitive) pop();
+				if (x1.intValue() >= x2.intValue()) {
 					jump(aLabel);
 					return;
 				}
 			} break;
 				
 			case IF_ICMPGT: {
-				JInt x2 = (JInt) pop();
-				JInt x1 = (JInt) pop();
-				if (x1.v > x2.v) {
+				JPrimitive x2 = (JPrimitive) pop();
+				JPrimitive x1 = (JPrimitive) pop();
+				if (x1.intValue() > x2.intValue()) {
 					jump(aLabel);
 					return;
 				}
 			} break;
 				
 			case IF_ICMPLE: {
-				JInt x2 = (JInt) pop();
-				JInt x1 = (JInt) pop();
-				if (x1.v <= x2.v) {
+				JPrimitive x2 = (JPrimitive) pop();
+				JPrimitive x1 = (JPrimitive) pop();
+				if (x1.intValue() <= x2.intValue()) {
 					jump(aLabel);
 					return;
 				}
@@ -913,7 +932,9 @@ public class JNormalBehavior extends JASMBehavior
 			} break;
 			
 			case INVOKESTATIC: {
-				JBehavior theBehavior = getInterpreter().getVirtual(aOwner, aName, aDesc);
+				JClass theClass = getInterpreter().getClass(aOwner);
+				JBehavior theBehavior = theClass.getBehavior(JClass.getBehaviorKey(aName, aDesc));
+				if (theBehavior == null) throw new RuntimeException("Method not found: "+aOwner+"."+aName+" "+aDesc);
 				JObject[] theArgs = new JObject[theBehavior.getArgCount()];
 				for(int i=theArgs.length-1;i>=0;i--) theArgs[i] = pop();
 				JObject theResult = theBehavior.invoke(this, null, theArgs);
@@ -949,14 +970,20 @@ public class JNormalBehavior extends JASMBehavior
 				push(theClass.newInstance());
 			} break;
 				
-			case ANEWARRAY:
-				throw new UnsupportedOperationException();
+			case ANEWARRAY:{
+				JInt size = (JInt) pop();
+				push(new SimpleArray(size.v));
+			} break;
 				
 			case CHECKCAST:
 				throw new UnsupportedOperationException();
 								
-			case INSTANCEOF:
-				throw new UnsupportedOperationException();
+			case INSTANCEOF: {
+				JInstance o = (JInstance) pop();
+				JClass theClass = getInterpreter().getClass(aType);
+				boolean theResult = theClass.isAssignableFrom(o.getType());
+				push(new JInt(theResult ? 1 : 0));
+			} break;
 				
 			default: 
 				throw new UnsupportedOperationException();

@@ -1,4 +1,5 @@
 /*
+TOD - Trace Oriented Debugger.
 Copyright (c) 2006-2008, Guillaume Pothier
 All rights reserved.
 
@@ -30,32 +31,42 @@ Inc. MD5 Message-Digest Algorithm".
 */
 package zz.jinterp;
 
+import org.objectweb.asm.tree.ClassNode;
+
 import zz.jinterp.JNormalBehavior.JFrame;
+import zz.jinterp.JPrimitive.JFloat;
+import zz.jinterp.JPrimitive.JInt;
 
 
-public abstract class JBehavior extends JMember
+public class JClass_java_lang_Float extends JNormalClass
 {
-	public JBehavior(JClass aClass)
+	public static final String NAME = "java/lang/Float";
+	
+	public JClass_java_lang_Float(JInterpreter aInterpreter, ClassNode aNode)
 	{
-		super(aClass);
+		super(aInterpreter, aNode);
+		JReflectiveClass.initBehaviors(this, getClass());
 	}
 	
-	public abstract int getArgCount();
-	public final JObject invoke(JFrame aParentFrame, JObject aTarget, JObject... aArgs)
+    public static int __floatToRawIntBits(float value) { return 0; }
+	public JObject _floatToRawIntBits(JFrame aParentFrame, JInstance aTarget, JObject[] aArgs)
 	{
-		getDeclaringClass().clInit(aParentFrame);
-		return invoke0(aParentFrame, aTarget, aArgs);
+		JFloat value = (JFloat) aArgs[0];
+		return new JInt(Float.floatToRawIntBits(value.v));
 	}
-	
-	protected abstract JObject invoke0(JFrame aParentFrame, JObject aTarget, JObject... aArgs);
-	
-	public abstract String getName();
-	
-	public abstract boolean isPrivate();
-	
-	@Override
-	public String toString()
+
+	public static int __floatToIntBits(float value) { return 0; }
+	public JObject _floatToIntBits(JFrame aParentFrame, JInstance aTarget, JObject[] aArgs)
 	{
-		return getDeclaringClass()+"."+getName();
+		JFloat value = (JFloat) aArgs[0];
+		return new JInt(Float.floatToIntBits(value.v));
 	}
+
+	public static float __intBitsToFloat(int bits) { return 0; }
+	public JObject _intBitsToFloat(JFrame aParentFrame, JInstance aTarget, JObject[] aArgs)
+	{
+		JInt bits = (JInt) aArgs[0];
+		return new JFloat(Float.intBitsToFloat(bits.v));
+	}
+
 }

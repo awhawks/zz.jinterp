@@ -34,6 +34,7 @@ package zz.jinterp;
 import java.util.HashMap;
 import java.util.Map;
 
+import zz.jinterp.JNormalBehavior.JFrame;
 import zz.jinterp.SimpleInterp.SimpleInstance;
 
 
@@ -45,14 +46,18 @@ public abstract class JClass extends JType
 {
 	private final JInterpreter itsInterpreter;
 	private final JClass itsSuperclass;
+	private final JClass[] itsInterfaces;
 	
 	private final Map<String, JBehavior> itsBehaviors = new HashMap<String, JBehavior>();
 	private final Map<String, JField> itsFields = new HashMap<String, JField>();
 	
-	protected JClass(JInterpreter aInterpreter, JClass aSuperClass)
+	private boolean itsClInitDone = false;
+	
+	protected JClass(JInterpreter aInterpreter, JClass aSuperClass, JClass[] aInterfaces)
 	{
 		itsInterpreter = aInterpreter;
 		itsSuperclass = aSuperClass;
+		itsInterfaces = aInterfaces;
 	}
 
 	/**
@@ -60,12 +65,31 @@ public abstract class JClass extends JType
 	 * In particular any action that might cause a class to be retrieved 
 	 * from the interpreter should be executed in this method instead of 
 	 * in the constructor to avoid infinite recursion.
+	 * Subclasses must call super.
 	 */
 	void init()
 	{
 	}
 	
+	/**
+	 * Calls <clinit> on this class if it exists.
+	 */
+	public void clInit(JFrame aParentFrame)
+	{
+		if (itsClInitDone) return;
+		itsClInitDone = true;
+		JBehavior theBehavior = getBehavior(getBehaviorKey("<clinit>", "()V"));
+		if (theBehavior != null) 
+		{
+			theBehavior.invoke(aParentFrame, null);
+		}
+	}
+	
+
+	
 	public abstract String getName();
+	
+	public abstract boolean isInterface();
 	
 	@Override
 	public JObject getInitialValue()
@@ -81,6 +105,11 @@ public abstract class JClass extends JType
 	public JClass getSuperclass()
 	{
 		return itsSuperclass;
+	}
+	
+	public JClass[] getInterfaces()
+	{
+		return itsInterfaces;
 	}
 	
 	public JInterpreter getInterpreter()
@@ -177,6 +206,24 @@ public abstract class JClass extends JType
 			theIgnorePrivate = true;
 		}
 		return null;
+	}
+	
+	/**
+	 * Same semantics as {@link Class#isAssignableFrom(Class)}
+	 */
+	public boolean isAssignableFrom(JClass aClass)
+	{
+		JClass theClass = aClass;
+		while(theClass != null)
+		{
+			if (theClass == this) return true;
+			for (JClass theInterface : theClass.getInterfaces())
+			{
+				if (theInterface == this) return true;
+			}
+			theClass = theClass.getSuperclass();
+		}
+		return false;
 	}
 	
 	@Override

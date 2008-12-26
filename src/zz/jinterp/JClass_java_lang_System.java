@@ -35,6 +35,7 @@ import org.objectweb.asm.tree.ClassNode;
 
 import zz.jinterp.JNormalBehavior.JFrame;
 import zz.jinterp.JPrimitive.JInt;
+import zz.jinterp.JPrimitive.JLong;
 
 
 public class JClass_java_lang_System extends JNormalClass
@@ -47,7 +48,7 @@ public class JClass_java_lang_System extends JNormalClass
 		JReflectiveClass.initBehaviors(this, getClass());
 	}
 	
-	public void __arraycopy(Object src, int srcPos, Object dest, int destPos, int length) {}
+	public static void __arraycopy(Object src, int srcPos, Object dest, int destPos, int length) {}
 	public JObject _arraycopy(JFrame aParentFrame, JInstance aTarget, JObject[] aArgs)
 	{
 		JArray src = (JArray) aArgs[0];
@@ -59,6 +60,18 @@ public class JClass_java_lang_System extends JNormalClass
 		for(int i=0;i<len.v;i++) dest.set(i+destPos.v, src.get(i+srcPos.v));
 		
 		return JPrimitive.VOID;
+	}
+
+	public static void __registerNatives() {}
+	public JObject _registerNatives(JFrame aParentFrame, JInstance aTarget, JObject[] aArgs)
+	{
+		return JPrimitive.VOID;
+	}
+	
+    public static long __currentTimeMillis() { return 0; };
+	public JObject _currentTimeMillis(JFrame aParentFrame, JInstance aTarget, JObject[] aArgs)
+	{
+		return new JLong(System.currentTimeMillis());
 	}
 
 }

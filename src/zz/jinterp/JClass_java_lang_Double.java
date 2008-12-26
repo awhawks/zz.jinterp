@@ -1,4 +1,5 @@
 /*
+TOD - Trace Oriented Debugger.
 Copyright (c) 2006-2008, Guillaume Pothier
 All rights reserved.
 
@@ -30,32 +31,42 @@ Inc. MD5 Message-Digest Algorithm".
 */
 package zz.jinterp;
 
+import org.objectweb.asm.tree.ClassNode;
+
 import zz.jinterp.JNormalBehavior.JFrame;
+import zz.jinterp.JPrimitive.JDouble;
+import zz.jinterp.JPrimitive.JLong;
 
 
-public abstract class JBehavior extends JMember
+public class JClass_java_lang_Double extends JNormalClass
 {
-	public JBehavior(JClass aClass)
+	public static final String NAME = "java/lang/Double";
+	
+	public JClass_java_lang_Double(JInterpreter aInterpreter, ClassNode aNode)
 	{
-		super(aClass);
+		super(aInterpreter, aNode);
+		JReflectiveClass.initBehaviors(this, getClass());
 	}
 	
-	public abstract int getArgCount();
-	public final JObject invoke(JFrame aParentFrame, JObject aTarget, JObject... aArgs)
+    public static long __doubleToRawLongBits(double value) { return 0; }
+	public JObject _doubleToRawLongBits(JFrame aParentFrame, JInstance aTarget, JObject[] aArgs)
 	{
-		getDeclaringClass().clInit(aParentFrame);
-		return invoke0(aParentFrame, aTarget, aArgs);
+		JDouble value = (JDouble) aArgs[0];
+		return new JLong(Double.doubleToRawLongBits(value.v));
 	}
-	
-	protected abstract JObject invoke0(JFrame aParentFrame, JObject aTarget, JObject... aArgs);
-	
-	public abstract String getName();
-	
-	public abstract boolean isPrivate();
-	
-	@Override
-	public String toString()
+
+	public static long __doubleToLongBits(double value) { return 0; }
+	public JObject _doubleToLongBits(JFrame aParentFrame, JInstance aTarget, JObject[] aArgs)
 	{
-		return getDeclaringClass()+"."+getName();
+		JDouble value = (JDouble) aArgs[0];
+		return new JLong(Double.doubleToLongBits(value.v));
 	}
+
+	public static double __longBitsToDouble(long bits) { return 0; }
+	public JObject _longBitsToDouble(JFrame aParentFrame, JInstance aTarget, JObject[] aArgs)
+	{
+		JLong bits = (JLong) aArgs[0];
+		return new JDouble(Double.longBitsToDouble(bits.v));
+	}
+
 }

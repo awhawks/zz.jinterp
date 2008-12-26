@@ -45,17 +45,12 @@ public class JNormalClass extends JClass
 
 	protected JNormalClass(JInterpreter aInterpreter, ClassNode aNode)
 	{
-		super(aInterpreter, getSuperclass(aInterpreter, aNode));
+		super(aInterpreter, getSuperclass(aInterpreter, aNode), getInterfaces(aInterpreter, aNode));
 		itsNode = aNode;
 	}
 	
 	@Override
 	void init()
-	{
-		initBehaviors();
-	}
-	
-	private void initBehaviors()
 	{
 		if (itsNode != null)
 		{
@@ -74,15 +69,15 @@ public class JNormalClass extends JClass
 				FieldNode theFieldNode = (FieldNode) theIterator.next();
 				JType theType = getInterpreter().getType(theFieldNode.desc);
 				
-				JField theField = getInterpreter().createField(
-						this, 
-						theFieldNode.name, 
-						theType,
-						(theFieldNode.access & Opcodes.ACC_PRIVATE) != 0);
+				JField theField = (theFieldNode.access & Opcodes.ACC_STATIC) != 0 ?
+						getInterpreter().createStaticField(this, theFieldNode.name, theType, theFieldNode.access)
+						: new JField(this, theFieldNode.name, theType, theFieldNode.access);
 				
 				putField(theFieldNode.name, theField);
 			}
 		}
+		
+		super.init();
 	}
 	
 	
@@ -101,10 +96,30 @@ public class JNormalClass extends JClass
 		return aClassNode.superName != null ? aInterpreter.getClass(aClassNode.superName) : null;
 	}
 	
+	public static JClass[] getInterfaces(JInterpreter aInterpreter, ClassNode aClassNode)
+	{
+		if (aClassNode == null) return new JClass[0];
+		
+		JClass[] theResult = new JClass[aClassNode.interfaces.size()];
+		for(int i=0;i<theResult.length;i++)
+		{
+			String theInterfaceName = (String) aClassNode.interfaces.get(i);
+			JClass theInterface = aInterpreter.getClass(theInterfaceName);
+			theResult[i] = theInterface;
+		}
+		return theResult;
+	}
+	
 	@Override
 	public String getName()
 	{
 		return itsNode.name;
+	}
+	
+	@Override
+	public boolean isInterface()
+	{
+		return (itsNode.access & Opcodes.ACC_INTERFACE) != 0;
 	}
 	
 }

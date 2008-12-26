@@ -31,15 +31,22 @@ Inc. MD5 Message-Digest Algorithm".
 */
 package zz.jinterp;
 
+import zz.jinterp.JNormalBehavior.JFrame;
 
 
-public class JClass_java_lang_Class extends JClass
+
+public class JClass_java_lang_Class extends JReflectiveClass
 {
 	public static final String NAME = "java/lang/Class";
 	
 	public JClass_java_lang_Class(JInterpreter aInterpreter, JClass aSuperClass)
 	{
-		super(aInterpreter, aSuperClass);
+		super(aInterpreter, aSuperClass, new JClass[] {
+				aInterpreter.getClass("java/io/Serializable"),
+				aInterpreter.getClass("java/lang/reflect/GenericDeclaration"),
+				aInterpreter.getClass("java/lang/reflect/Type"),
+				aInterpreter.getClass("java/lang/reflect/AnnotatedElement"),
+		});
 	}
 	
 	@Override
@@ -54,17 +61,33 @@ public class JClass_java_lang_Class extends JClass
 		throw new UnsupportedOperationException();
 	}
 	
+    static Class __getPrimitiveClass(String name) { return null; };
+	public JObject _getPrimitiveClass(JFrame aParentFrame, JInstance aTarget, JObject[] aArgs)
+	{
+		String theName = getInterpreter().toString((JInstance) aArgs[0]);
+		if ("boolean".equals(theName)) return getInterpreter().getMetaclass(JPrimitiveType.BOOLEAN);
+		else if ("byte".equals(theName)) return getInterpreter().getMetaclass(JPrimitiveType.BYTE);
+		else if ("char".equals(theName)) return getInterpreter().getMetaclass(JPrimitiveType.CHAR);
+		else if ("double".equals(theName)) return getInterpreter().getMetaclass(JPrimitiveType.DOUBLE);
+		else if ("float".equals(theName)) return getInterpreter().getMetaclass(JPrimitiveType.FLOAT);
+		else if ("int".equals(theName)) return getInterpreter().getMetaclass(JPrimitiveType.INT);
+		else if ("long".equals(theName)) return getInterpreter().getMetaclass(JPrimitiveType.LONG);
+		else if ("short".equals(theName)) return getInterpreter().getMetaclass(JPrimitiveType.SHORT);
+		else throw new RuntimeException("Not handled: "+theName);
+	}
+
+	
 	public static class Instance extends JInstance
 	{
-		private final JClass itsDelegate;
+		private final JType itsDelegate;
 
-		public Instance(JClass aClass, JClass aDelegate)
+		public Instance(JClass aClass, JType aDelegate)
 		{
 			super(aClass);
 			itsDelegate = aDelegate;
 		}
 
-		public JClass getDelegate()
+		public JType getDelegate()
 		{
 			return itsDelegate;
 		}

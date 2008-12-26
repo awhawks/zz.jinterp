@@ -56,9 +56,9 @@ public class SimpleInterp extends JInterpreter
 	}
 
 	@Override
-	public JField createField(JClass aClass, String aName, JType aType, boolean aPrivate)
+	public JStaticField createStaticField(JClass aClass, String aName, JType aType, int aAccess)
 	{
-		return new SimpleField(aClass, aName, aType, aPrivate);
+		return new SimpleStaticField(aClass, aName, aType, aAccess);
 	}
 
 	public static class SimpleInstance extends JInstance
@@ -111,14 +111,20 @@ public class SimpleInterp extends JInterpreter
 		}
 	}
 	
-	public static class SimpleField extends JField
+	public static class SimpleStaticField extends JStaticField
 	{
 		private JObject itsStaticValue;
-
-		public SimpleField(JClass aClass, String aName, JType aType, boolean aPrivate)
+		
+		public SimpleStaticField(JClass aClass, String aName, JType aType, int aAccess)
 		{
-			super(aClass, aName, aType, aPrivate);
+			super(aClass, aName, aType, aAccess);
 			itsStaticValue = getType().getInitialValue();
+		}
+		
+		public SimpleStaticField(JClass aClass, String aName, JType aType, int aAccess, JObject aStaticValue)
+		{
+			super(aClass, aName, aType, aAccess);
+			itsStaticValue = aStaticValue;
 		}
 
 		@Override
@@ -126,7 +132,7 @@ public class SimpleInterp extends JInterpreter
 		{
 			return itsStaticValue;
 		}
-
+		
 		@Override
 		public void putStaticFieldValue(JObject aValue)
 		{

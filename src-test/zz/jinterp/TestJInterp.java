@@ -36,10 +36,12 @@ import junit.framework.Assert;
 
 public class TestJInterp
 {
+	static SimpleInterp interp = new SimpleInterp();
+
+	
 	@org.junit.Test
 	public void test1()
 	{
-		SimpleInterp interp = new SimpleInterp();
 		JObject[] args = interp.toJObjects(10, 11); 
 		JObject theResult = interp.invoke(null, "zz/jinterp/SimpleClass", "ari", "(II)I", null, args);
 		if (theResult instanceof JInt)
@@ -53,7 +55,6 @@ public class TestJInterp
 	@org.junit.Test
 	public void test2()
 	{
-		SimpleInterp interp = new SimpleInterp();
 		JObject[] args = interp.toJObjects("Hello"); 
 		JObject theResult = interp.invoke(null, "zz/jinterp/SimpleClass", "strOp", "(Ljava/lang/String;)Ljava/lang/String;", null, args);
 		if (theResult instanceof JInstance)
@@ -65,4 +66,16 @@ public class TestJInterp
 		else Assert.fail();
 	}
 
+	@org.junit.Test
+	public void testStaticInit()
+	{
+		JObject[] args = {}; 
+		JObject theResult = interp.invoke(null, "zz/jinterp/SimpleClass", "s", "()I", null, args);
+		if (theResult instanceof JInt)
+		{
+			JInt theInt = (JInt) theResult;
+			Assert.assertEquals(theInt.v, SimpleClass.s());
+		}
+		else Assert.fail();
+	}
 }

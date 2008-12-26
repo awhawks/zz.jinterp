@@ -41,6 +41,8 @@ import org.objectweb.asm.tree.ClassNode;
 import zz.jinterp.JClass_java_lang_Class.Instance;
 import zz.jinterp.JNormalBehavior.JFrame;
 import zz.jinterp.JPrimitive.JChar;
+import zz.jinterp.JPrimitive.JDouble;
+import zz.jinterp.JPrimitive.JFloat;
 import zz.jinterp.JPrimitive.JInt;
 import zz.jinterp.JPrimitive.JLong;
 import zz.jinterp.SimpleInterp.SimpleArray;
@@ -54,7 +56,7 @@ import zz.jinterp.SimpleInterp.SimpleInstance;
 public abstract class JInterpreter
 {
 	private final Map<String, JClass> itsLoadedClasses = new HashMap<String, JClass>();
-	private final Map<JClass, JClass_java_lang_Class.Instance> itsLoadedMetaclasses = new HashMap<JClass, Instance>();
+	private final Map<JType, JClass_java_lang_Class.Instance> itsLoadedMetaclasses = new HashMap<JType, Instance>();
 	private final JClass_java_lang_Object itsObjectClass = new JClass_java_lang_Object(this);
 	private final JClass_java_lang_Class itsMetaclassClass = new JClass_java_lang_Class(this, itsObjectClass);
 
@@ -64,6 +66,8 @@ public abstract class JInterpreter
 		itsLoadedClasses.put(JClass_java_lang_Class.NAME, itsMetaclassClass);
 		
 		loadNativeClass(JClass_java_lang_System.NAME);
+		loadNativeClass(JClass_java_lang_Float.NAME);
+		loadNativeClass(JClass_java_lang_Double.NAME);
 	}
 	
 	/**
@@ -103,13 +107,13 @@ public abstract class JInterpreter
 		}
 	}
 	
-	public Instance getMetaclass(JClass aClass)
+	public Instance getMetaclass(JType aType)
 	{
-		Instance theInstance = itsLoadedMetaclasses.get(aClass);
+		Instance theInstance = itsLoadedMetaclasses.get(aType);
 		if (theInstance == null)
 		{
-			theInstance = new Instance(null, aClass);
-			itsLoadedMetaclasses.put(aClass, theInstance);
+			theInstance = new Instance(null, aType);
+			itsLoadedMetaclasses.put(aType, theInstance);
 		}
 		return theInstance;
 	}
@@ -122,11 +126,12 @@ public abstract class JInterpreter
 	}
 	
 	/**
-	 * Creates a field descriptor.
-	 * This method can be overridden by subclasses, in particular if they need
-	 * some special handling of static field values.
+	 * Creates a static field descriptor.
+	 * This method can be overridden by subclasses if they need
+	 * some special handling of static field values (in the same way the can
+	 * subclass JInstance).
 	 */
-	public abstract JField createField(JClass aClass, String aName, JType aType, boolean aPrivate);
+	public abstract JStaticField createStaticField(JClass aClass, String aName, JType aType, int aAccess);
 
 	/**
 	 * Executes a method
@@ -215,6 +220,14 @@ public abstract class JInterpreter
 		else if (aObject instanceof Long)
 		{
 			return new JLong((Long) aObject);
+		}
+		else if (aObject instanceof Double)
+		{
+			return new JDouble((Double) aObject);
+		}
+		else if (aObject instanceof Float)
+		{
+			return new JFloat((Float) aObject);
 		}
 		else if (aObject instanceof String)
 		{
