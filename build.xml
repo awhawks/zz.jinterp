@@ -7,12 +7,21 @@
 	<target name="init">
 		<property name="path.src.java" location="${basedir}/src"/>
 		
+		<property name="path.lib" location="${basedir}/lib"/>
 		<property name="path.build" location="${basedir}/build"/>
 		<property name="path.classes" location="${basedir}/classes"/>
+		
+        <property name="zz.utils.dir" value="${basedir}/../zz.utils"/>
 		
 		<property name="file.jar" location="${path.build}/zz.jinterp.jar"/>
 		
 		<property name="encoding" value="UTF-8"/>
+		
+        <path id="classpath">
+            <pathelement path="${path.lib}/asm-all-3.2-svn.jar"/>
+            <pathelement path="${zz.utils.dir}/build/zz.utils.jar"/>
+        </path>
+
 
 		<echo message="Base dir: ${basedir}" />
 	</target>	
@@ -33,7 +42,8 @@
 			destdir="${path.classes}"
 			encoding="${encoding}"
 			debug="true"
-	      	deprecation="on">
+	      	deprecation="on"
+			classpathref="classpath">
 			
 		</javac>
 	</target>
