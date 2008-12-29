@@ -975,8 +975,13 @@ public class JNormalBehavior extends JASMBehavior
 				push(new SimpleArray(size.v));
 			} break;
 				
-			case CHECKCAST:
-				throw new UnsupportedOperationException();
+			case CHECKCAST: {
+				JInstance o = (JInstance) pop();
+				JClass theClass = getInterpreter().getClass(aType);
+				boolean theResult = theClass.isAssignableFrom(o.getType());
+				if (theResult) push(o);
+				else throwEx(getInterpreter().new_ClassCastException(this, "Cannot cast "+o.getType()+" to "+aType));
+			} break;
 								
 			case INSTANCEOF: {
 				JInstance o = (JInstance) pop();

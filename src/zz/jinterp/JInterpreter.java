@@ -169,11 +169,21 @@ public abstract class JInterpreter
 		return theInstance;
 	}
 	
+	public JInstance new_ClassCastException(JFrame aParentFrame, String aMessage)
+	{
+		return new_Exception("ClassCastException", aParentFrame, aMessage);
+	}
+	
 	public JInstance new_NullPointerException(JFrame aParentFrame, String aMessage)
+	{
+		return new_Exception("NullPointerException", aParentFrame, aMessage);
+	}
+	
+	public JInstance new_Exception(String aNQClassName, JFrame aParentFrame, String aMessage)
 	{
 		return instantiate(
 				aParentFrame, 
-				"java/lang/NullPointerException", 
+				"java/lang/"+aNQClassName, 
 				"(Ljava/lang/String;)V", 
 				toJString(aMessage));
 	}
