@@ -40,11 +40,14 @@ import org.objectweb.asm.tree.ClassNode;
 
 import zz.jinterp.JClass_java_lang_Class.Instance;
 import zz.jinterp.JNormalBehavior.JFrame;
+import zz.jinterp.JPrimitive.JBoolean;
+import zz.jinterp.JPrimitive.JByte;
 import zz.jinterp.JPrimitive.JChar;
 import zz.jinterp.JPrimitive.JDouble;
 import zz.jinterp.JPrimitive.JFloat;
 import zz.jinterp.JPrimitive.JInt;
 import zz.jinterp.JPrimitive.JLong;
+import zz.jinterp.JPrimitive.JShort;
 import zz.jinterp.SimpleInterp.SimpleArray;
 import zz.jinterp.SimpleInterp.SimpleInstance;
 
@@ -242,6 +245,22 @@ public abstract class JInterpreter
 		else if (aObject instanceof String)
 		{
 			return toJString((String) aObject);
+		}
+		else if (aObject instanceof Boolean)
+		{
+			return new JBoolean((Boolean) aObject);
+		}
+		else if (aObject instanceof Short)
+		{
+			return new JShort((Short) aObject);
+		}
+		else if (aObject instanceof Byte)
+		{
+			return new JByte((Byte) aObject);
+		}
+		else if (aObject instanceof Character)
+		{
+			return new JChar((Character) aObject);
 		}
 		else throw new IllegalArgumentException(""+aObject);
 	}

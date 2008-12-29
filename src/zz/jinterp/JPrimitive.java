@@ -52,6 +52,28 @@ public abstract class JPrimitive extends JObject
 	
 	public static final JObject VOID = new JVoid();
 	
+	public static class JBoolean extends JPrimitive
+	{
+		public final boolean v;
+
+		public JBoolean(boolean aV)
+		{
+			v = aV;
+		}
+
+		@Override
+		public JType getType()
+		{
+			return JPrimitiveType.BOOLEAN;
+		}
+
+		@Override
+		public int intValue()
+		{
+			return v ? 1 : 0;
+		}
+	}
+	
 	public static abstract class JNumber extends JPrimitive
 	{
 		public abstract JNumber add(JNumber aNumber);
