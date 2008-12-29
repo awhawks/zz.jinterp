@@ -37,6 +37,7 @@ import java.util.Map;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.EmptyVisitor;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -51,6 +52,7 @@ import zz.jinterp.JPrimitive.JLong;
 import zz.jinterp.JPrimitive.JNumber;
 import zz.jinterp.JPrimitive.JShort;
 import zz.jinterp.SimpleInterp.SimpleArray;
+import zz.utils.Utils;
 
 public class JNormalBehavior extends JASMBehavior
 {
@@ -69,6 +71,7 @@ public class JNormalBehavior extends JASMBehavior
 		JObject[] theArgs;
 		if ((getNode().access & Opcodes.ACC_STATIC) == 0) 
 		{
+			// Not static
 			if (aTarget == null) 
 			{
 				aParentFrame.throwEx(getInterpreter().new_NullPointerException(aParentFrame, "null"));
@@ -80,6 +83,7 @@ public class JNormalBehavior extends JASMBehavior
 		}
 		else 
 		{
+			// Static
 			if (aTarget != null) throw new RuntimeException("Cannot pass a target to a static method");
 			theArgs = aArgs;
 		}
@@ -885,7 +889,17 @@ public class JNormalBehavior extends JASMBehavior
 		@Override
 		public void visitLdcInsn(Object aCst)
 		{
-			push(getInterpreter().toJObject(aCst));
+			JObject theResult;
+			if (aCst instanceof Type)
+			{
+				Type theType = (Type) aCst;
+				theResult = getInterpreter().getMetaclass(getInterpreter().getType(theType.getDescriptor()));
+			}
+			else
+			{
+				theResult = getInterpreter().toJObject(aCst);
+			}
+			push(theResult);
 			itsInstructionPointer++;
 		}
 
@@ -903,6 +917,7 @@ public class JNormalBehavior extends JASMBehavior
 			case INVOKEVIRTUAL: 
 			case INVOKEINTERFACE: {
 				JBehavior theBehavior = getInterpreter().getVirtual(aOwner, aName, aDesc);
+				if (theBehavior == null) Utils.rtex("Cannot find behavior: %s, %s, %s", aOwner, aName, aDesc);
 				JObject[] theArgs = new JObject[theBehavior.getArgCount()];
 				for(int i=theArgs.length-1;i>=0;i--) theArgs[i] = pop();
 				JInstance theTarget = (JInstance) pop();

@@ -32,6 +32,7 @@ Inc. MD5 Message-Digest Algorithm".
 package zz.jinterp;
 
 import zz.jinterp.JNormalBehavior.JFrame;
+import zz.jinterp.JPrimitive.JBoolean;
 
 
 
@@ -76,6 +77,11 @@ public class JClass_java_lang_Class extends JReflectiveClass
 		else throw new RuntimeException("Not handled: "+theName);
 	}
 
+    public boolean __desiredAssertionStatus() { return false; }
+	public JObject _desiredAssertionStatus(JFrame aParentFrame, JInstance aTarget, JObject[] aArgs)
+	{
+		return JBoolean._false;
+	}
 	
 	public static class Instance extends JInstance
 	{

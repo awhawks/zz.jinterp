@@ -34,6 +34,9 @@ package zz.jinterp;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+
 import zz.jinterp.JNormalBehavior.JFrame;
 import zz.jinterp.SimpleInterp.SimpleInstance;
 
@@ -144,6 +147,38 @@ public abstract class JClass extends JType
 		itsBehaviors.put(aKey, aBehavior);
 	}
 	
+	protected void putBehavior(final String aName, String aDesc, final int aAccess, final Invocable aBody)
+	{
+		final int theArgCount = Type.getArgumentTypes(aDesc).length;
+		putBehavior(getBehaviorKey(aName, aDesc), new JBehavior(this)
+		{
+			@Override
+			public boolean isPrivate()
+			{
+				return (aAccess & Opcodes.ACC_PRIVATE) != 0;
+			}
+			
+			@Override
+			public int getArgCount()
+			{
+				return theArgCount;
+			}
+
+			@Override
+			public String getName()
+			{
+				return aName;
+			}
+
+			@Override
+			protected JObject invoke0(JFrame aParentFrame, JObject aTarget, JObject... aArgs)
+			{
+				return aBody.invoke(aParentFrame, aTarget, aArgs);
+			}
+
+		});
+	}
+	
 	protected void putField(String aName, JField aField)
 	{
 		itsFields.put(aName, aField);
@@ -230,5 +265,10 @@ public abstract class JClass extends JType
 	public String toString()
 	{
 		return getName();
+	}
+	
+	public static abstract class Invocable
+	{
+		public abstract JObject invoke(JFrame aParentFrame, JObject aTarget, JObject... aArgs);
 	}
 }

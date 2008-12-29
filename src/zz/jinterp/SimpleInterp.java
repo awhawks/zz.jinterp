@@ -31,11 +31,14 @@ Inc. MD5 Message-Digest Algorithm".
 */
 package zz.jinterp;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+import zz.jinterp.JNormalBehavior.JFrame;
 import zz.utils.Utils;
 
 public class SimpleInterp extends JInterpreter
@@ -59,6 +62,24 @@ public class SimpleInterp extends JInterpreter
 	public JStaticField createStaticField(JClass aClass, String aName, JType aType, int aAccess)
 	{
 		return new SimpleStaticField(aClass, aName, aType, aAccess);
+	}
+
+	@Override
+	public JInstance getFileSystem(JFrame aParentFrame)
+	{
+		try
+		{
+			Field theField = File.class.getDeclaredField("fs");
+			theField.setAccessible(true);
+			Object theFileSystem = theField.get(null);
+			
+			return instantiate(aParentFrame, theFileSystem.getClass().getName().replace('.', '/'), "()V");
+		}
+		catch (Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		
 	}
 
 	public static class SimpleInstance extends JInstance

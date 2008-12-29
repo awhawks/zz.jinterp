@@ -54,6 +54,9 @@ public abstract class JPrimitive extends JObject
 	
 	public static class JBoolean extends JPrimitive
 	{
+		public static final JBoolean _true = new JBoolean(true);
+		public static final JBoolean _false = new JBoolean(false);
+		
 		public final boolean v;
 
 		public JBoolean(boolean aV)

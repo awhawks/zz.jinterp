@@ -71,6 +71,10 @@ public abstract class JInterpreter
 		loadNativeClass(JClass_java_lang_System.NAME);
 		loadNativeClass(JClass_java_lang_Float.NAME);
 		loadNativeClass(JClass_java_lang_Double.NAME);
+		loadNativeClass(JClass_java_io_FileSystem.NAME);
+		loadNativeClass(JClass_java_io_UnixFileSystem.NAME);
+		loadNativeClass(JClass_java_lang_Throwable.NAME);
+		loadNativeClass(JClass_java_security_AccessController.NAME);
 	}
 	
 	/**
@@ -115,7 +119,7 @@ public abstract class JInterpreter
 		Instance theInstance = itsLoadedMetaclasses.get(aType);
 		if (theInstance == null)
 		{
-			theInstance = new Instance(null, aType);
+			theInstance = new Instance(itsMetaclassClass, aType);
 			itsLoadedMetaclasses.put(aType, theInstance);
 		}
 		return theInstance;
@@ -304,4 +308,9 @@ public abstract class JInterpreter
 		
 		return new String(theChars);
 	}
+	
+	/**
+	 * Returns the object to use as an implementation of java.io.FileSystem.
+	 */
+	public abstract JInstance getFileSystem(JFrame aParentFrame);
 }

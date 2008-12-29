@@ -43,28 +43,10 @@ public class JClass_java_lang_Object extends JReflectiveClass
 	{
 		super(aInterpreter, null, new JClass[0]);
 		
-		putBehavior(getBehaviorKey("<init>", "()V"), new JBehavior(this)
+		putBehavior("<init>", "()V", 0, new Invocable()
 		{
 			@Override
-			public int getArgCount()
-			{
-				return 0;
-			}
-			
-			@Override
-			public boolean isPrivate()
-			{
-				return false;
-			}
-
-			@Override
-			public String getName()
-			{
-				return "<init>";
-			}
-
-			@Override
-			public JObject invoke0(JFrame aParentFrame, JObject aTarget, JObject... aArgs)
+			public JObject invoke(JFrame aParentFrame, JObject aTarget, JObject... aArgs)
 			{
 				return JPrimitive.VOID;
 			}
