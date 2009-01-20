@@ -58,12 +58,23 @@ import zz.jinterp.SimpleInterp.SimpleInstance;
  */
 public abstract class JInterpreter
 {
-	private final Map<String, JClass> itsLoadedClasses = new HashMap<String, JClass>();
-	private final Map<JType, JClass_java_lang_Class.Instance> itsLoadedMetaclasses = new HashMap<JType, Instance>();
-	private final JClass_java_lang_Object itsObjectClass = new JClass_java_lang_Object(this);
-	private final JClass_java_lang_Class itsMetaclassClass = new JClass_java_lang_Class(this, itsObjectClass);
+	private Map<String, JClass> itsLoadedClasses;
+	private Map<JType, JClass_java_lang_Class.Instance> itsLoadedMetaclasses;
+	private JClass_java_lang_Object itsObjectClass;
+	private JClass_java_lang_Class itsMetaclassClass;
 
+	private void checkInit()
 	{
+		if (itsLoadedClasses == null) init();
+	}
+	
+	private void init()
+	{
+		itsLoadedClasses = new HashMap<String, JClass>();
+		itsLoadedMetaclasses = new HashMap<JType, Instance>();
+		itsObjectClass = new JClass_java_lang_Object(this);
+		itsMetaclassClass = new JClass_java_lang_Class(this, itsObjectClass);
+		
 		// Load special classes
 		itsLoadedClasses.put(JClass_java_lang_Object.NAME, itsObjectClass);
 		itsLoadedClasses.put(JClass_java_lang_Class.NAME, itsMetaclassClass);
@@ -85,6 +96,7 @@ public abstract class JInterpreter
 	
 	public JClass getClass(String aName)
 	{
+		checkInit();
 		JClass theClass = itsLoadedClasses.get(aName);
 		if (theClass == null)
 		{
@@ -98,6 +110,7 @@ public abstract class JInterpreter
 	
 	protected void loadNativeClass(String aName)
 	{
+		checkInit();
 		byte[] theBytecode = getClassBytecode(aName);
 		ClassNode theClassNode = JNormalClass.readClass(theBytecode);
 		try
@@ -116,6 +129,7 @@ public abstract class JInterpreter
 	
 	public Instance getMetaclass(JType aType)
 	{
+		checkInit();
 		Instance theInstance = itsLoadedMetaclasses.get(aType);
 		if (theInstance == null)
 		{
