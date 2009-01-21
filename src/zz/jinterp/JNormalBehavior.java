@@ -939,6 +939,7 @@ public class JNormalBehavior extends JASMBehavior
 			case INVOKESPECIAL: {
 				JClass theClass = getInterpreter().getClass(aOwner);
 				JBehavior theBehavior = theClass.getBehavior(aName, aDesc);
+				if (theBehavior == null) Utils.rtex("Behavior not found: %s %s in %s", aName, aDesc, theClass.getName());
 				JObject[] theArgs = new JObject[theBehavior.getArgCount()];
 				for(int i=theArgs.length-1;i>=0;i--) theArgs[i] = pop();
 				JObject theTarget = pop();
@@ -949,7 +950,7 @@ public class JNormalBehavior extends JASMBehavior
 			case INVOKESTATIC: {
 				JClass theClass = getInterpreter().getClass(aOwner);
 				JBehavior theBehavior = theClass.getBehavior(JClass.getBehaviorKey(aName, aDesc));
-				if (theBehavior == null) throw new RuntimeException("Method not found: "+aOwner+"."+aName+" "+aDesc);
+				if (theBehavior == null) Utils.rtex("Behavior not found: %s %s in %s", aName, aDesc, theClass.getName());
 				JObject[] theArgs = new JObject[theBehavior.getArgCount()];
 				for(int i=theArgs.length-1;i>=0;i--) theArgs[i] = pop();
 				JObject theResult = theBehavior.invoke(this, null, theArgs);
