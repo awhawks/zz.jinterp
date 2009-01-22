@@ -58,6 +58,11 @@ import zz.jinterp.SimpleInterp.SimpleInstance;
  */
 public abstract class JInterpreter
 {
+	/**
+	 * Utility constant that can be used to call no-args methods.
+	 */
+	public static final JObject[] NOARGS = {};
+	
 	private Map<String, JClass> itsLoadedClasses;
 	private Map<JType, JClass_java_lang_Class.Instance> itsLoadedMetaclasses;
 	private JClass_java_lang_Object itsObjectClass;
