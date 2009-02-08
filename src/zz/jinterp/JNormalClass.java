@@ -92,8 +92,17 @@ public class JNormalClass extends JClass
 	
 	public static JClass getSuperclass(JInterpreter aInterpreter, ClassNode aClassNode)
 	{
-		if (aClassNode == null) return null;
-		return aClassNode.superName != null ? aInterpreter.getClass(aClassNode.superName) : null;
+		JClass theClass = null;
+		if (aClassNode != null) 
+		{
+			theClass = aClassNode.superName != null ? aInterpreter.getClass(aClassNode.superName) : null;
+		}
+		else
+		{
+			theClass = aInterpreter.getClass("java/lang/Object");
+		}
+		
+		return theClass;
 	}
 	
 	public static JClass[] getInterfaces(JInterpreter aInterpreter, ClassNode aClassNode)
@@ -113,7 +122,7 @@ public class JNormalClass extends JClass
 	@Override
 	public String getName()
 	{
-		return itsNode.name;
+		return itsNode != null ? itsNode.name : "invalid class";
 	}
 	
 	@Override

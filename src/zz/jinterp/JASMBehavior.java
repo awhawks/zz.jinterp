@@ -31,14 +31,25 @@ Inc. MD5 Message-Digest Algorithm".
 */
 package zz.jinterp;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TryCatchBlockNode;
 
 public abstract class JASMBehavior extends JBehavior
 {
 	private final MethodNode itsMethodNode;
 	private final int itsArgCount;
+	private final List<TryCatchBlock> itsTryCatchBlocks = new ArrayList<TryCatchBlock>();
+	private final Map<LabelNode, Integer> itsLabelToIP = new HashMap<LabelNode, Integer>();
 
 	public JASMBehavior(JClass aClass, MethodNode aMethodNode)
 	{
@@ -46,6 +57,35 @@ public abstract class JASMBehavior extends JBehavior
 		itsMethodNode = aMethodNode;
 		Type[] theArgumentTypes = Type.getArgumentTypes(itsMethodNode.desc);
 		itsArgCount = theArgumentTypes.length;
+		
+
+		// Map labels to instruction pointers
+		for(int i=0;i<getNode().instructions.size();i++)
+		{
+			AbstractInsnNode theInsn = getNode().instructions.get(i);
+			if (theInsn instanceof LabelNode) itsLabelToIP.put((LabelNode) theInsn, i);
+		}
+
+		// Transform try-catch blocks
+		for (Iterator theIterator = getNode().tryCatchBlocks.iterator(); theIterator.hasNext();)
+		{
+			TryCatchBlockNode theBlock = (TryCatchBlockNode) theIterator.next();
+			itsTryCatchBlocks.add(new TryCatchBlock(
+					getLabelIP(theBlock.start),
+					getLabelIP(theBlock.end),
+					getLabelIP(theBlock.handler),
+					theBlock.type));
+		}
+	}
+	
+	protected int getLabelIP(LabelNode aNode)
+	{
+		return itsLabelToIP.get(aNode);
+	}
+	
+	public List<TryCatchBlock> getTryCatchBlocks()
+	{
+		return itsTryCatchBlocks;
 	}
 	
 	public MethodNode getNode()
@@ -71,4 +111,23 @@ public abstract class JASMBehavior extends JBehavior
 		return itsArgCount;
 	}
 
+	/**
+	 * Same as {@link TryCatchBlockNode} but with intruction pointers instead of labels.
+	 * @author gpothier
+	 */
+	public static final class TryCatchBlock
+	{
+		public final int start;
+		public final int end;
+		public final int handler;
+		public final String type;
+		
+		public TryCatchBlock(int aStart, int aEnd, int aHandler, String aType)
+		{
+			start = aStart;
+			end = aEnd;
+			handler = aHandler;
+			type = aType;
+		}
+	}
 }

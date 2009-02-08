@@ -31,9 +31,17 @@ Inc. MD5 Message-Digest Algorithm".
 */
 package zz.jinterp;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class JInstance extends JObject
 {
 	private final JClass itsClass;
+	
+	/**
+	 * Used only for instances of Throwable.
+	 */
+	private List<String> itsStackTraceInfo;
 	
 	public JInstance(JClass aClass)
 	{
@@ -48,6 +56,12 @@ public abstract class JInstance extends JObject
 
 	public abstract JObject getFieldValue(JField aField);
 	public abstract void putFieldValue(JField aField, JObject aValue);
+	
+	public List<String> getStackTraceInfo()
+	{
+		if (itsStackTraceInfo == null) itsStackTraceInfo = new ArrayList<String>();
+		return itsStackTraceInfo;
+	}
 	
 	@Override
 	public String toString()

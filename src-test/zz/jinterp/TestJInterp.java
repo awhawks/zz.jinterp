@@ -78,4 +78,12 @@ public class TestJInterp
 		}
 		else Assert.fail();
 	}
+	
+	@org.junit.Test
+	public void testException()
+	{
+		JObject[] args = {}; 
+		JInt theResult = (JInt) interp.invoke(null, "zz/jinterp/SimpleClass", "testException1", "()I", null, args);
+		Assert.assertEquals(theResult.v, 4);
+	}
 }

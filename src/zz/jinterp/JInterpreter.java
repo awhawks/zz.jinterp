@@ -87,10 +87,14 @@ public abstract class JInterpreter
 		loadNativeClass(JClass_java_lang_System.NAME);
 		loadNativeClass(JClass_java_lang_Float.NAME);
 		loadNativeClass(JClass_java_lang_Double.NAME);
+		loadNativeClass(JClass_java_lang_String.NAME);
 		loadNativeClass(JClass_java_io_FileSystem.NAME);
 		loadNativeClass(JClass_java_io_UnixFileSystem.NAME);
 		loadNativeClass(JClass_java_lang_Throwable.NAME);
 		loadNativeClass(JClass_java_security_AccessController.NAME);
+		loadNativeClass(JClass_sun_reflect_ReflectionFactory$GetReflectionFactoryAction.NAME);
+		loadNativeClass(JClass_sun_reflect_ReflectionFactory.NAME);
+		loadNativeClass(JClass_java_io_ObjectStreamClass.NAME);
 	}
 	
 	/**
@@ -309,6 +313,9 @@ public abstract class JInterpreter
 		return theInstance;
 	}
 	
+	/**
+	 * Converts a JInterpreter String to a Java String.
+	 */
 	public String toString(JInstance aInstance)
 	{
 		JClass theClass = getClass("java/lang/String");
@@ -332,4 +339,5 @@ public abstract class JInterpreter
 	 * Returns the object to use as an implementation of java.io.FileSystem.
 	 */
 	public abstract JInstance getFileSystem(JFrame aParentFrame);
+	public abstract JInstance getReflectionFactory(JFrame aParentFrame);
 }

@@ -32,6 +32,8 @@ Inc. MD5 Message-Digest Algorithm".
 package zz.jinterp;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.objectweb.asm.Label;
@@ -41,6 +43,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.EmptyVisitor;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TryCatchBlockNode;
 
 import zz.jinterp.JPrimitive.JBitNumber;
 import zz.jinterp.JPrimitive.JByte;
@@ -89,9 +92,22 @@ public class JNormalBehavior extends JASMBehavior
 		}
 		
 		JFrame theFrame = new JFrame(aParentFrame, theArgs, getNode().maxLocals, getNode().maxStack);
-		while (theFrame.step() != -1);
-		if (theFrame.itsException != null) return null;
-		else return theFrame.itsReturnValue;
+		try
+		{
+			while (theFrame.step() != -1);
+		}
+		catch (ExceptionThrown e)
+		{
+			List<String> theStackTraceInfo = e.getException().getStackTraceInfo();
+			StringBuilder theBuilder = new StringBuilder();
+			for (String theEntry : theStackTraceInfo)
+			{
+				theBuilder.append(theEntry);
+				theBuilder.append('\n');
+			}
+			throw new RuntimeException("Exception thrown during evaluation: "+e.getException().getType()+"\n"+theBuilder);
+		}
+		return theFrame.itsReturnValue;
 	}
 	
 	private class Setup extends EmptyVisitor
@@ -189,7 +205,6 @@ public class JNormalBehavior extends JASMBehavior
 		
 		private int itsInstructionPointer;
 		private JObject itsReturnValue;
-		private JInstance itsException;
 		
 		public JFrame(JFrame aParentFrame, JObject[] aArgs, int aNLocals, int aStackSize)
 		{
@@ -200,7 +215,6 @@ public class JNormalBehavior extends JASMBehavior
 			itsStackSize = 0;
 			itsInstructionPointer = 0;
 			itsReturnValue = JPrimitive.VOID;
-			itsException = null;
 		}
 		
 		public JFrame getParentFrame()
@@ -210,26 +224,21 @@ public class JNormalBehavior extends JASMBehavior
 		
 		public int step()
 		{
-			if (itsException != null)
+			AbstractInsnNode theInsnNode = getNode().instructions.get(itsInstructionPointer);
+			try
 			{
-				if (itsParentFrame == null)
-				{
-					throw new RuntimeException("Exception: "+itsException);
-				}
-				itsParentFrame.throwEx(itsException);
-				itsInstructionPointer = -1;
-			}
-			else
-			{
-				AbstractInsnNode theInsnNode = getNode().instructions.get(itsInstructionPointer);
 				theInsnNode.accept(this);
 			}
+			catch (ExceptionThrown e)
+			{
+				throwEx(e.getException());
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				throwEx(getInterpreter().new_Exception("RuntimeException", this, "JInterpreter exception: "+e.getMessage()));
+			}
 			return itsInstructionPointer;
-		}
-		
-		public void throwEx(JInstance aException)
-		{
-			itsException = aException;
 		}
 		
 		private void push(JObject aValue)
@@ -251,7 +260,49 @@ public class JNormalBehavior extends JASMBehavior
 		{
 			itsLocals[aIndex] = aValue;
 		}
+		
+		private boolean match(JInstance aException, String aType)
+		{
+			JClass theClass = aException.getType();
+			while (theClass != null)
+			{
+				if (aType.equals(theClass.getName())) return true;
+				theClass = theClass.getSuperclass();
+			}
+			return false;
+		}
 
+		private TryCatchBlock getHandler(JInstance aException)
+		{
+			for (TryCatchBlock theBlock : getTryCatchBlocks())
+			{
+				if (itsInstructionPointer < theBlock.start || itsInstructionPointer >= theBlock.end) continue;
+				if (! match(aException, theBlock.type)) continue;
+				return theBlock;
+			}
+			return null;
+		}
+		
+		private void throwEx(JInstance aException)
+		{
+			// Add stack trace info
+			List<String> theStackTraceInfo = aException.getStackTraceInfo();
+			theStackTraceInfo.add(getDeclaringClass().getName()+"."+getName()+":"+itsInstructionPointer);
+			
+			// Handle exception
+			TryCatchBlock theHandler = getHandler(aException);
+			if (theHandler != null) 
+			{
+				itsStackSize = 0;
+				push(aException);
+				itsInstructionPointer = theHandler.handler;
+			}
+			else
+			{
+				throw new ExceptionThrown(aException);
+			}
+		}
+		
 		@Override
 		public void visitLabel(Label aLabel)
 		{
@@ -263,14 +314,17 @@ public class JNormalBehavior extends JASMBehavior
 		{
 			JClass theClass = getInterpreter().getClass(aOwner);
 			JField theField = theClass.getVirtualField(aName);
-			
+			if (theField == null) Utils.rtex("Cannot find field: %s, %s, %s", aOwner, aName, aDesc);
+
 			switch(aOpcode)
 			{
 			case GETSTATIC:
+				theClass.clInit(this);
 				push(((JStaticField) theField).getStaticFieldValue());
 				break;
 				
 			case PUTSTATIC: {
+				theClass.clInit(this);
 				JObject v = pop();
 				((JStaticField) theField).putStaticFieldValue(v);
 			} break;
@@ -689,8 +743,10 @@ public class JNormalBehavior extends JASMBehavior
 				push(new JInt(array.getSize()));
 			} break;
 				
-			case ATHROW:
-				throw new UnsupportedOperationException();
+			case ATHROW: {
+				JInstance theException = (JInstance) pop();
+				throwEx(theException);
+			} return;
 				
 			case MONITORENTER:
 				throw new UnsupportedOperationException();
@@ -939,7 +995,7 @@ public class JNormalBehavior extends JASMBehavior
 			case INVOKESPECIAL: {
 				JClass theClass = getInterpreter().getClass(aOwner);
 				JBehavior theBehavior = theClass.getBehavior(aName, aDesc);
-				if (theBehavior == null) Utils.rtex("Behavior not found: %s %s in %s", aName, aDesc, theClass.getName());
+				if (theBehavior == null) Utils.rtex("Behavior not found: %s %s in %s", aName, aDesc, aOwner);
 				JObject[] theArgs = new JObject[theBehavior.getArgCount()];
 				for(int i=theArgs.length-1;i>=0;i--) theArgs[i] = pop();
 				JObject theTarget = pop();
@@ -1044,4 +1100,18 @@ public class JNormalBehavior extends JASMBehavior
 		}
 	}
 
+	private static class ExceptionThrown extends RuntimeException
+	{
+		private final JInstance itsException;
+
+		public ExceptionThrown(JInstance aException)
+		{
+			itsException = aException;
+		}
+		
+		public JInstance getException()
+		{
+			return itsException;
+		}
+	}
 }

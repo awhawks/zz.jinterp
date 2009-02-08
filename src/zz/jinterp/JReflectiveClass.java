@@ -34,6 +34,7 @@ package zz.jinterp;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import zz.jinterp.JClass.Invocable;
 import zz.jinterp.JNormalBehavior.JFrame;
 
 public abstract class JReflectiveClass extends JClass
@@ -49,7 +50,22 @@ public abstract class JReflectiveClass extends JClass
 	{
 		return false;
 	}
+
+	public static void addDefaultCtor(JClass aTarget)
+	{
+		aTarget.putBehavior("<init>", "()V", 0, new Invocable()
+		{
+			@Override
+			public JObject invoke(JFrame aParentFrame, JObject aTarget, JObject... aArgs)
+			{
+				return JPrimitive.VOID;
+			}
+		});		
+	}
 	
+	/**
+	 * Adds JBehaviors to the target class, taking them from the specified java class.
+	 */
 	public static void initBehaviors(JClass aTarget, Class aClass)
 	{
 		try

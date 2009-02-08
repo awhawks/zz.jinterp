@@ -31,56 +31,38 @@ Inc. MD5 Message-Digest Algorithm".
 */
 package zz.jinterp;
 
-public class SimpleClass
+import java.util.HashMap;
+import java.util.Map;
+
+import org.objectweb.asm.tree.ClassNode;
+
+import zz.jinterp.JNormalBehavior.JFrame;
+import zz.jinterp.JPrimitive.JFloat;
+import zz.jinterp.JPrimitive.JInt;
+
+
+public class JClass_java_lang_String extends JNormalClass
 {
-	static int s = 5;
+	public static final String NAME = "java/lang/String";
+	private Map<String, JInstance> itsInternedStrings = new HashMap<String, JInstance>();
 	
-	public static int ari(int i1, int i2)
+	public JClass_java_lang_String(JInterpreter aInterpreter, ClassNode aNode)
 	{
-		i2 += foo(i1);
-		return i1 > 0 ? i1+i2 : i1 - i2;
+		super(aInterpreter, aNode);
+		JReflectiveClass.initBehaviors(this, getClass());
 	}
 	
-	public static int foo(int b)
+    public static String __intern() { return null; }
+	public JObject _intern(JFrame aParentFrame, JInstance aTarget, JObject[] aArgs)
 	{
-		return 3*b + 2;
-	}
-	
-	public static String strOp(String s1)
-	{
-		return s1+"hop";
-	}
-	
-	public static int s()
-	{
-		return s+1;
-	}
-	
-	public static int testException1()
-	{
-		for(int i=0;i<10;i++)
+		JClass_java_lang_String theClass = (JClass_java_lang_String) aTarget.getType();
+		String theString = theClass.getInterpreter().toString(aTarget);
+		JInstance theResult = itsInternedStrings.get(theString);
+		if (theResult == null)
 		{
-			try
-			{
-				testException2(i);
-			}
-			catch (Exception e)
-			{
-				return i;
-			}
+			theResult = aTarget;
+			itsInternedStrings.put(theString, theResult);
 		}
-		return -1;
-	}
-	
-	public static void testException2(int i)
-	{
-		try
-		{
-			if (i == 4) throw new RuntimeException();
-		}
-		catch (NullPointerException e)
-		{
-			throw new RuntimeException(e);
-		}
+		return theResult;
 	}
 }

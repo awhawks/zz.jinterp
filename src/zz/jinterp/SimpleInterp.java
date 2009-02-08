@@ -43,6 +43,8 @@ import zz.utils.Utils;
 
 public class SimpleInterp extends JInterpreter
 {
+	private JInstance itsReflectionFactory;
+	
 	@Override
 	protected byte[] getClassBytecode(String aName)
 	{
@@ -79,9 +81,19 @@ public class SimpleInterp extends JInterpreter
 		{
 			throw new RuntimeException(e);
 		}
-		
 	}
 
+	@Override
+	public JInstance getReflectionFactory(JFrame aParentFrame)
+	{
+		if (itsReflectionFactory == null)
+		{
+			itsReflectionFactory = instantiate(aParentFrame, JClass_sun_reflect_ReflectionFactory.NAME, "()V");
+		}
+		
+		return itsReflectionFactory;
+	}
+	
 	public static class SimpleInstance extends JInstance
 	{
 		private final Map<JField, JObject> itsFields = new HashMap<JField, JObject>();

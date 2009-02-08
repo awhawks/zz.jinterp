@@ -74,4 +74,10 @@ public class JField extends JMember
 	{
 		return (itsAccess & Opcodes.ACC_STATIC) != 0;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return getDeclaringClass()+"."+getName();
+	}
 }

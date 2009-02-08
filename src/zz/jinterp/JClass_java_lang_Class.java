@@ -83,6 +83,28 @@ public class JClass_java_lang_Class extends JReflectiveClass
 		return JBoolean._false;
 	}
 	
+	public boolean __isArray() { return false; }
+	public JObject _isArray(JFrame aParentFrame, JInstance aTarget, JObject[] aArgs)
+	{
+		Instance theTarget = (Instance) aTarget;
+		return (theTarget.getDelegate() instanceof JArrayType) ? JBoolean._true : JBoolean._false; 
+	}
+	
+	public boolean __isPrimitive() { return false; }
+	public JObject _isPrimitive(JFrame aParentFrame, JInstance aTarget, JObject[] aArgs)
+	{
+		Instance theTarget = (Instance) aTarget;
+		return (theTarget.getDelegate() instanceof JPrimitiveType) ? JBoolean._true : JBoolean._false; 
+	}
+	
+	public Class __getComponentType() { return null; }
+	public JObject _getComponentType(JFrame aParentFrame, JInstance aTarget, JObject[] aArgs)
+	{
+		Instance theTarget = (Instance) aTarget;
+		JArrayType theType = (JArrayType) theTarget.getDelegate();
+		return getInterpreter().getMetaclass(theType.getElementType());
+	}
+	
 	public static class Instance extends JInstance
 	{
 		private final JType itsDelegate;
